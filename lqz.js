@@ -25,23 +25,45 @@ function waitingFor(time, done) {
   }, time);
 }
 
+const IS_CHROME = window.navigator.userAgent.match(/CHROME/i);
+const IS_FIREFOX = window.navigator.userAgent.match(/FIREFOX/i);
+
+function setLocalStorage(key, value) {
+  console.log("BROWSER");
+  if (IS_CHROME) {
+    console.log("CHROME");
+    chrome.storage.local.set({ [key]: value });
+  } else if (IS_FIREFOX) {
+    console.log("IS FIREFOX");
+    browser.storage.local.set({ [key]: value });
+  }
+}
+
+function getLocalStorage(key, callback) {
+  if (IS_CHROME) {
+    chrome.storage.local.get([key], callback);
+  } else if (IS_FIREFOX) {
+    browser.storage.local.get(key).then(callback);
+  }
+}
+
 // BITWARDEN
 /*
   this block of code get the account name and set as query string in the url
 */
 if (window.location.hostname.match(/\.signin\.aws/) !== null) {
-  console.log("AWS Signin Page");
+  console.log("AWS SIGNIN PAGE");
 
   waitForElementToExist("[data-testId='test-header']").then((element) => {
     const awsAccountName = element?.innerText?.split(" ")?.reverse()?.[0];
-    console.log("AWS Account Name: ", awsAccountName);
+    console.log("AWS ACCOUNT NAME: ", awsAccountName);
     history.pushState({}, "", `?${awsAccountName}`);
   });
 }
 
 // PERSIST ACCOUNT NAME IN COOKIE BASED ON ID
 if (window.location.hostname.match(/\.awsapps\.com/) !== null) {
-  console.log("AWS account Page");
+  console.log("AWS ACCOUNT PAGE");
 
   waitForElementToExist(".portal-instance-section").then(() => {
     const portalInstances = document.querySelectorAll(
@@ -55,17 +77,16 @@ if (window.location.hostname.match(/\.awsapps\.com/) !== null) {
         ?.innerText?.replace("#", "");
       const name = instance?.querySelector(".name")?.innerText;
       console.log("ID: ", id);
-      console.log("Name: ", name);
+      console.log("NAME: ", name);
       accounts.push({ id, name });
     });
-
-    chrome.storage.local.set({ accounts });
+    setLocalStorage("accounts", accounts);
   });
 }
 
 // RETRIEVE ACCOUNT NAME FROM COOKIE BASED ON ID
 if (window.location.hostname.match(/\.console\.aws\.amazon\.com/) !== null) {
-  chrome.storage.local.get(["accounts"], function (accounts) {
+  getLocalStorage("accounts", function (accounts) {
     if (!accounts) {
       console.log("ACCOUNTS NOT FOUND");
       return;
