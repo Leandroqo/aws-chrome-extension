@@ -49,17 +49,13 @@ export function getData() {
           ?.replaceAll("-", "");
         const account = accounts?.accounts?.find(
           (account) => account.id === currentAccountId
-        );
+        ) || { name: currentAccountId || "Unknown", id: "Unknown" };
 
         // ADD DIV TO SHOW ACCOUNT NAME
         if (!document.querySelector("#lqz-account-name")) {
           const topNav = document.querySelector("#awsc-top-level-nav");
           const div = document.createElement("div");
           div.id = "lqz-account-name";
-          // div.style = ``;
-
-          // div.textContent = account?.name;
-
           topNav.appendChild(div);
           mountMenu(div, accounts?.accounts, account);
           style();
@@ -109,7 +105,9 @@ function style() {
       display: none;
       position: absolute;
       top: 10px;
+      right: 5px;
       padding: 0;
+      min-width: 400px;
     }
 
 
