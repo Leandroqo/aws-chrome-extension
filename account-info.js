@@ -93,6 +93,14 @@ function style() {
       cursor: pointer;
     }
 
+    #lqz-account-name > button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
     #lqz-account-name:hover > ul {
       display: block;
     }
@@ -110,7 +118,6 @@ function style() {
       min-width: 400px;
     }
 
-
     .lqz-item > a {
       background: #232f3e;
       color: white;
@@ -122,6 +129,14 @@ function style() {
 
     .lqz-item:hover > a {
       background-color: #1c8c1c;
+    }
+
+    .lqz-show {
+      display: block !important;
+    }
+
+    .lqz-hide {
+      display: hidden !important;
     }
   `;
 
@@ -137,8 +152,21 @@ function mountMenu(lqzMenu, accounts, account) {
     }) || "";
 
     lqzMenu.innerHTML = `
-      <div>${account?.name}</div>
+      <button>${account?.name}</button>
       <ul>${liAccounts}</ul>
     `;
+
+    document
+      .querySelector("#lqz-account-name > button")
+      ?.addEventListener("click", function (event) {
+        const list = document.querySelector("#lqz-account-name > ul");
+        if (list.className === "lqz-show") {
+          list.classList.remove("lqz-show");
+          list.classList.add("lqz-hide");
+        } else {
+          list.classList.remove("lqz-hide");
+          list.classList.add("lqz-show");
+        }
+      });
   });
 }
