@@ -4,6 +4,12 @@
 export function storeData() {
   console.log("AWS ACCOUNT PAGE");
 
+  // CLICK AWS ACCOUNT BOX
+  waitForElementToExist('[title="AWS Account"]').then((el) => {
+    console.log("ELEMENT =>", el);
+    el.querySelectorAll('[title="AWS Account"]')[0]?.click();
+  });
+
   let accounts = [];
   waitForElementToExist(".portal-instance-section").then(() => {
     const portalInstances = document.querySelectorAll(
@@ -11,6 +17,9 @@ export function storeData() {
     );
 
     portalInstances?.forEach((instance) => {
+      //OPEN INSTANCE
+      instance.querySelector(".instance-section")?.click();
+
       const id = instance
         ?.querySelector(".accountId")
         ?.innerText?.replace("#", "");
