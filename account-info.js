@@ -102,6 +102,13 @@ function style() {
       cursor: pointer;
     }
 
+    select[name="lqz-aws-account"] {
+      border: none;
+      font-weight: bold;
+      color: white;
+      background: none;
+    }
+
     #lqz-account-name > button {
       background: none;
       border: none;
@@ -155,27 +162,33 @@ function style() {
 function mountMenu(lqzMenu, accounts, account) {
   getLocalStorage("sso", function ({ sso }) {
     let liAccounts = "";
+
+    const currentOption = accounts?.find((acc) => acc.name === account.name);
+
+    if (currentOption) {
+      const url = sso?.url
+        ?.replace("{id}", currentOption.id)
+        .replace("{name}", currentOption.name);
+      liAccounts += `<option value="${url}">${currentOption.name}</option>`;
+    }
+
     accounts?.forEach((acc) => {
-      const url = sso?.url?.replace("{id}", acc.id).replace("{name}", acc.name);
-      liAccounts += `<li class="lqz-item"><a href="${url}">${acc.name}</a></li>`;
+      if (acc.name !== account.name) {
+        const url = sso?.url
+          ?.replace("{id}", acc.id)
+          .replace("{name}", acc.name);
+        liAccounts += `<option value="${url}">${acc.name}</option>`;
+      }
     }) || "";
 
     lqzMenu.innerHTML = `
-      <button>${account?.name}</button>
-      <ul>${liAccounts}</ul>
+      <select name="lqz-aws-account">${liAccounts}</select>
     `;
 
     document
-      .querySelector("#lqz-account-name > button")
-      ?.addEventListener("click", function (event) {
-        const list = document.querySelector("#lqz-account-name > ul");
-        if (list.className === "lqz-show") {
-          list.classList.remove("lqz-show");
-          list.classList.add("lqz-hide");
-        } else {
-          list.classList.remove("lqz-hide");
-          list.classList.add("lqz-show");
-        }
+      .querySelector("select[name='lqz-aws-account']")
+      ?.addEventListener("change", function (event) {
+        window.location.href = event.target.value;
       });
   });
 }
